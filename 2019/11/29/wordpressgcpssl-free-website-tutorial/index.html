@@ -108,7 +108,7 @@ sudo /opt/bitnami/ctlscript.sh restart nginx
 <pre><code>sudo /opt/bitnami/letsencrypt/scripts/generate-certificate.sh -m YOURMAIL -d YOURDOMAIN
 </code></pre>
 <p><img src="https://growingdna.com/wp-content/uploads/2019/11/%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7-2019-11-29-%E4%B8%8A%E5%8D%8811.05.20.png"></p>
-<p>記得要把【YOURMAIL】和【YOURDOMAIN】改成自己的喔<br>以我的為例，mail就是<a href="mailto:&#x67;&#x72;&#111;&#119;&#x69;&#110;&#x67;&#x64;&#x6e;&#x61;&#64;&#x67;&#109;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;">&#x67;&#x72;&#111;&#119;&#x69;&#110;&#x67;&#x64;&#x6e;&#x61;&#64;&#x67;&#109;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;</a>; domain 就是 growingdna.com</p>
+<p>記得要把【YOURMAIL】和【YOURDOMAIN】改成自己的喔<br>以我的為例，mail就是<a href="mailto:&#x67;&#114;&#x6f;&#119;&#x69;&#110;&#x67;&#x64;&#x6e;&#x61;&#64;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#109;">&#x67;&#114;&#x6f;&#119;&#x69;&#110;&#x67;&#x64;&#x6e;&#x61;&#64;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#109;</a>; domain 就是 growingdna.com</p>
 <p>開始安裝後，系統會在中途詢問幾個問題，都只要輸入 y 同意即可<br>不過比較麻煩的是，Let’s encrypt 三個月就會失效<br>所以我們要自己寫一個腳本 (crontab) 來讓他自動更新</p>
 <p>[step]3[&#x2F;step]<br>建立腳本自動更新 SSL</p>
 <p>首先在神秘的終端機內輸入以下指令</p>
