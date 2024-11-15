@@ -1,0 +1,439 @@
+<!DOCTYPE html><html class="appearance-light" lang="en"><head><meta charset="UTF-8"><title>PHP + Laravel 雞排聯盟API實作: 串接歐付寶金流API</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/style/common/jquery.fancybox.min.css"><script src="/js/highlight.pack.js"></script><meta name="description" content="前言在前面的幾篇文章中 我們陸續完成了雞排聯盟API的雛型
+那麼 如果我們要新增訂單並以第三方金流結帳的話 要怎麼處理呢?
+以下就以歐付寶的API為範例 介紹如何串接歐付寶的信用卡支付API 達成結帳的效果
+流程簡介根據歐付寶官網介紹 https://developers.opay.tw/AioCreditCard/CreateOrder 信用卡金流服務流程如下 
+而我的文章的大略流程如下:
+
+clone 歐付寶SDK (什麼SDK? 參考文章) 並複製到專案資料夾底下
+建立 Controller 並複製 SDK 內的 example 以串接歐付寶API
+建立 Orders table 紀錄交易資料
+建立前台畫面輸入訂單
+實際建立訂單以確認流程ok
+
+實作1. clone 歐付寶SDK，並複製到專案資料夾底.."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Haojen's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">PHP + Laravel 雞排聯盟API實作: 串接歐付寶金流API</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Click back to the top</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B%E7%B0%A1%E4%BB%8B"><span class="toc-text">流程簡介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%A6%E4%BD%9C"><span class="toc-text">實作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-clone-%E6%AD%90%E4%BB%98%E5%AF%B6SDK%EF%BC%8C%E4%B8%A6%E8%A4%87%E8%A3%BD%E5%88%B0%E5%B0%88%E6%A1%88%E8%B3%87%E6%96%99%E5%A4%BE%E5%BA%95%E4%B8%8B"><span class="toc-text">1. clone 歐付寶SDK，並複製到專案資料夾底下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%BB%BA%E7%AB%8B-Controller-%E4%B8%A6%E8%A4%87%E8%A3%BD-SDK-%E5%85%A7%E7%9A%84-example-%E4%BB%A5%E4%B8%B2%E6%8E%A5%E6%AD%90%E4%BB%98%E5%AF%B6API"><span class="toc-text">2. 建立 Controller 並複製 SDK 內的 example 以串接歐付寶API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%BB%BA%E7%AB%8B-orders-table-Model-%E7%B4%80%E9%8C%84%E4%BA%A4%E6%98%93%E8%B3%87%E6%96%99"><span class="toc-text">3. 建立 orders table &amp; Model 紀錄交易資料</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%BB%BA%E7%AB%8B%E5%89%8D%E5%8F%B0%E7%95%AB%E9%9D%A2%E8%BC%B8%E5%85%A5%E8%A8%82%E5%96%AE"><span class="toc-text">4. 建立前台畫面輸入訂單</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%AF%A6%E9%9A%9B%E5%BB%BA%E7%AB%8B%E8%A8%82%E5%96%AE%E4%BB%A5%E7%A2%BA%E8%AA%8D%E6%B5%81%E7%A8%8Bok"><span class="toc-text">5. 實際建立訂單以確認流程ok</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0"><span class="toc-text">系列文章</span></a></li></ol></div><div class="column is-9"><header class="my-4"></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">PHP + Laravel 雞排聯盟API實作: 串接歐付寶金流API</h1><time class="has-text-grey" datetime="2020-02-13T07:08:55.000Z">2020-02-13</time><article class="mt-2 post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在前面的幾篇文章中 我們陸續完成了雞排聯盟API的雛型</p>
+<p>那麼 如果我們要新增訂單並以第三方金流結帳的話 要怎麼處理呢?</p>
+<p>以下就以歐付寶的API為範例 介紹如何串接歐付寶的信用卡支付API 達成結帳的效果</p>
+<h2 id="流程簡介"><a href="#流程簡介" class="headerlink" title="流程簡介"></a>流程簡介</h2><p>根據歐付寶官網介紹 <a target="_blank" rel="noopener" href="https://developers.opay.tw/AioCreditCard/CreateOrder">https://developers.opay.tw/AioCreditCard/CreateOrder</a> 信用卡金流服務流程如下 <img src="/wp-content/uploads/2020/02/image-1581497616586.png" alt="file"></p>
+<p>而我的文章的大略流程如下:</p>
+<ol>
+<li>clone 歐付寶SDK (什麼SDK? <a target="_blank" rel="noopener" href="https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/424027/">參考文章</a>) 並複製到專案資料夾底下</li>
+<li>建立 Controller 並複製 SDK 內的 example 以串接歐付寶API</li>
+<li>建立 <code>Orders</code> table 紀錄交易資料</li>
+<li>建立前台畫面輸入訂單</li>
+<li>實際建立訂單以確認流程ok</li>
+</ol>
+<h2 id="實作"><a href="#實作" class="headerlink" title="實作"></a>實作</h2><h3 id="1-clone-歐付寶SDK，並複製到專案資料夾底下"><a href="#1-clone-歐付寶SDK，並複製到專案資料夾底下" class="headerlink" title="1. clone 歐付寶SDK，並複製到專案資料夾底下"></a>1. clone 歐付寶SDK，並複製到專案資料夾底下</h3><p>[step]1[&#x2F;step] clone 歐付寶 SDK URL 如下 <a target="_blank" rel="noopener" href="https://github.com/o-pay/Payment_PHP">https://github.com/o-pay/Payment_PHP</a></p>
+<p>[step]2[&#x2F;step] 複製到專案資料夾底下 總共有2個 <img src="/wp-content/uploads/2020/02/image-1581497815085.png" alt="file"></p>
+<h3 id="2-建立-Controller-並複製-SDK-內的-example-以串接歐付寶API"><a href="#2-建立-Controller-並複製-SDK-內的-example-以串接歐付寶API" class="headerlink" title="2. 建立 Controller 並複製 SDK 內的 example 以串接歐付寶API"></a>2. 建立 Controller 並複製 SDK 內的 example 以串接歐付寶API</h3><p>[step]1[&#x2F;step] 在 terminal 內下指令建立 controller</p>
+<pre><code>php artisan make:controller OpayPaymentsController
+</code></pre>
+<p>[step]2[&#x2F;step] 複製 example 到我們的 controller 裡 首先是付款</p>
+<pre><code class="php">&lt;?php
+class OpayPaymentController extends Controller
+&#123;
+/**
+*
+*/
+    public function pay(Request $request) &#123;
+
+    //載入SDK(路徑可依系統規劃自行調整)
+    include(&#39;Opay.Payment.Integration.php&#39;);
+    try &#123;
+
+        $obj = new OpayAllInOne();
+
+        //服務參數
+        $obj-&gt;ServiceURL  = &quot;https://payment-stage.opay.tw/Cashier/AioCheckOut/V5&quot;;         //服務位置
+        $obj-&gt;HashKey     = &#39;5294y06JbISpM5x9&#39; ;                                            //測試用Hashkey，請自行帶入OPay提供的HashKey
+        $obj-&gt;HashIV      = &#39;v77hoKGq4kWxNNIS&#39; ;                                            //測試用HashIV，請自行帶入OPay提供的HashIV
+        $obj-&gt;MerchantID  = &#39;2000132&#39;;                                                      //測試用MerchantID，請自行帶入OPay提供的MerchantID
+        $obj-&gt;EncryptType = OpayEncryptType::ENC_SHA256;                                    //CheckMacValue加密類型，請固定填入1，使用SHA256加密
+
+        //基本參數(請依系統規劃自行調整)
+        $MerchantTradeNo = &quot;Test&quot;.time();
+
+        $obj-&gt;Send[&#39;ReturnURL&#39;]         = &#39;http://localhost/simple_ServerReplyPaymentStatus.php&#39;; //付款完成通知回傳的網址
+        $obj-&gt;Send[&#39;MerchantTradeNo&#39;]   = $MerchantTradeNo;                                       //訂單編號
+        $obj-&gt;Send[&#39;MerchantTradeDate&#39;] = date(&#39;Y/m/d H:i:s&#39;);                                    //交易時間
+        $obj-&gt;Send[&#39;TotalAmount&#39;]       = 2000;                                                   //交易金額
+        $obj-&gt;Send[&#39;TradeDesc&#39;]         = &quot;good to drink&quot;;                                        //交易描述
+        $obj-&gt;Send[&#39;ChoosePayment&#39;]     = OpayPaymentMethod::ALL;                                 //付款方式:全功能
+
+        //訂單的商品資料
+        array_push($obj-&gt;Send[&#39;Items&#39;], array(&#39;Name&#39; =&gt; &quot;歐付寶黑芝麻豆漿&quot;, &#39;Price&#39; =&gt; (int)&quot;2000&quot;,
+                   &#39;Currency&#39; =&gt; &quot;元&quot;, &#39;Quantity&#39; =&gt; (int) &quot;1&quot;, &#39;URL&#39; =&gt; &quot;dedwed&quot;));
+
+        //產生訂單(auto submit至OPay)
+        $obj-&gt;CheckOut();
+
+    &#125; catch (Exception $e) &#123;
+        echo $e-&gt;getMessage();
+      &#125;
+    &#125;
+&#125;
+?&gt;
+</code></pre>
+<p>接著是接收歐付寶 response 的部份</p>
+<pre><code class="php">  public function receive(Request $request) &#123;
+
+    //載入SDK(路徑可依系統規劃自行調整)
+    include(&#39;Opay.Payment.Integration.php&#39;);
+    try &#123;
+
+            $obj = new OpayAllInOne();
+
+            /* 服務參數 */
+            $obj-&gt;HashKey     = &#39;5294y06JbISpM5x9&#39; ;
+            $obj-&gt;HashIV      =  &#39;v77hoKGq4kWxNNIS&#39; ;
+            $obj-&gt;MerchantID  = &#39;2000132&#39;;
+            $obj-&gt;EncryptType = OpayEncryptType::ENC_SHA256;
+
+            /* 取得回傳參數 */
+            $arFeedback = $obj-&gt;CheckOutFeedback();
+
+            // 參數寫入檔案
+            if(true)
+            &#123;
+                $sLog_Path  = __DIR__.&#39;/sample_payment_return.log&#39; ; // LOG路徑
+                $sLog = &#39;+++++++++++++++++++++++++++++++++++++++ 接收回傳參數 &#39; . date(&#39;Y-m-d H:i:s&#39;) . &#39; ++++++++++++++++++++++++++++++++++++++++++++&#39; . &quot;\n&quot;;
+                $fp=fopen($sLog_Path, &quot;a+&quot;);
+                fputs($fp, $sLog);
+                fclose($fp);
+
+                $sLog_File =  print_r($arFeedback, true). &quot;\n&quot;;
+                $fp=fopen($sLog_Path, &quot;a+&quot;);
+                fputs($fp, $sLog_File);
+                fclose($fp);
+            &#125;
+
+            echo &#39;1OK&#39; ;
+
+    &#125; catch (Exception $e) &#123;
+        if(true)
+        &#123;
+            $sLog_Path  = __DIR__.&#39;/sample_payment_return.log&#39; ; // LOG路徑
+            $sLog = &#39;+++++++++++++++++++++++++++++++++++++++ 接收回傳參數(ERROR) &#39; . date(&#39;Y-m-d H:i:s&#39;) . &#39; ++++++++++++++++++++++++++++++++++++++++++++&#39; . &quot;\n&quot;;
+            $fp=fopen($sLog_Path, &quot;a+&quot;);
+            fputs($fp, $sLog);
+            fclose($fp);
+
+            $sLog_File =  $e-&gt;getMessage(). &quot;\n&quot;;
+            $fp=fopen($sLog_Path, &quot;a+&quot;);
+            fputs($fp, $sLog_File);
+            fclose($fp);
+        &#125;
+     &#125;
+    &#125;
+</code></pre>
+<p>[step]3[&#x2F;step] 置換掉include</p>
+<p>因為後面會一直include 歐付寶的 SDK 進來 所以這邊一次性置換成 use</p>
+<p>首先是刪掉 example 原本的 use</p>
+<pre><code>//載入SDK(路徑可依系統規劃自行調整)
+include(&#39;Opay.Payment.Integration.php&#39;);
+</code></pre>
+<p>接著新增AllPay.Payment.Integration.php到composer.json file</p>
+<pre><code>&quot;autoload-dev&quot;: &#123;
+    &quot;psr-4&quot;: &#123;
+        &quot;Tests\\&quot;: &quot;tests/&quot;
+    &#125;,
+    &quot;files&quot;: [
+        &quot;app/AllPay.Payment.Integration.php&quot; // 新增這個files
+    ]
+&#125;,
+</code></pre>
+<p>ps. 有關PSR-4 Autoloader 機制 可以參考以下文章 <a target="_blank" rel="noopener" href="http://blog.tonycube.com/2016/09/php-psr-4-autoloader.html">http://blog.tonycube.com/2016/09/php-psr-4-autoloader.html</a> 大概就是說我們直接拿<code>composer</code>的autoload來自動載入對應的檔案</p>
+<p>所以我們接著在 terminal 下 autoload 指令</p>
+<pre><code>composer dump-autoload
+</code></pre>
+<p>最後我們在 OpayPayment controller 裡 use 會使用到的 class</p>
+<pre><code class="php">&lt;?php
+namespace App\Http\Controllers;
+
+use OpayAllInOne;
+use OpayEncryptType;
+use Exception;
+use OpayPaymentMethod;
+</code></pre>
+<h3 id="3-建立-orders-table-Model-紀錄交易資料"><a href="#3-建立-orders-table-Model-紀錄交易資料" class="headerlink" title="3. 建立 orders table &amp; Model 紀錄交易資料"></a>3. 建立 <code>orders</code> table &amp; Model 紀錄交易資料</h3><p>這邊我們要用最簡單的方法生成訂單相關的 db table 及 model 以簡單達到兩個目的</p>
+<pre><code>1. 能成立訂單
+
+2. 能紀錄訂單是否已付款
+</code></pre>
+<p>[step]1[&#x2F;step] 生成 <code>orders</code> table 我們將使用 migration 在 terminal 內下指令</p>
+<pre><code>php artisan make:model Order -mc
+</code></pre>
+<ul>
+<li>m: 預產生migration</li>
+<li>c: 預產生controller</li>
+</ul>
+<p>[step]2[&#x2F;step] 完成 migration 內容 首先到剛剛用指令生成的 migration 裡新增我們要的欄位</p>
+<pre><code class="php">class CreateOrdersTable extends Migration
+&#123;
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    &#123;
+        Schema::create(&#39;orders&#39;, function (Blueprint $table) &#123;
+            $table-&gt;increments(&#39;id&#39;);
+            $table-&gt;string(&#39;name&#39;);
+            $table-&gt;integer(&#39;user_id&#39;);
+            $table-&gt;string(&#39;shop_name&#39;);
+            $table-&gt;string(&#39;item_name&#39;);
+            $table-&gt;string(&#39;item_description&#39;);
+            $table-&gt;integer(&#39;unit_price&#39;);
+            $table-&gt;integer(&#39;quantity&#39;);
+            $table-&gt;integer(&#39;total_amount&#39;);
+            $table-&gt;string(&#39;merchant_trade_no&#39;); // 預計拿這個訂單編來當作是PK
+            $table-&gt;boolean(&#39;status&#39;)-&gt;default(false);
+            $table-&gt;timestamps();
+        &#125;);
+    &#125;
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    &#123;
+        Schema::dropIfExists(&#39;orders&#39;);
+    &#125;
+&#125;
+</code></pre>
+<p>[step]3[&#x2F;step] 執行 migration</p>
+<pre><code>php artisan migrate
+</code></pre>
+<p>這樣子我們的 <code>orders</code> table 就完成了 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1581562260893.png" alt="file"></p>
+<p>[step]4[&#x2F;step] 完成 Order model 簡單寫兩個方法在裡面 分別是</p>
+<pre><code>1. 成立訂單
+2. 在付款完成後將status改為1(付款完)
+</code></pre>
+<p>code 如下</p>
+<pre><code class="php">&lt;?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Order extends Model
+&#123;
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+
+    public static function createOrder($item) &#123;
+        $order = new Order();
+        $order-&gt;name = $item[&#39;order_name&#39;];
+        $order-&gt;user_id = $item[&#39;user_id&#39;];
+        $order-&gt;shop_name = $item[&#39;shop_name&#39;];
+        $order-&gt;item_name = $item[&#39;product_name&#39;];
+        $order-&gt;item_description = isset($item[&#39;description&#39;]) ? $item[&#39;description&#39;] : &#39;&#39;;
+        $order-&gt;unit_price = $item[&#39;price&#39;];
+        $order-&gt;quantity = $item[&#39;qty&#39;];
+        $order-&gt;total_amount = $item[&#39;price&#39;] * $item[&#39;qty&#39;];
+        $order-&gt;merchant_trade_no = $item[&#39;merchant_trade_no&#39;];
+        $order-&gt;save();
+        return $order;
+    &#125;
+
+    public static function updateOrderStatus($merchant_trade_no) &#123;
+        $order = Order::where(&#39;merchant_trade_no&#39;, $merchant_trade_no)-&gt;update([&#39;status&#39; =&gt; 1]);
+        return $order;
+    &#125;
+&#125;
+</code></pre>
+<h3 id="4-建立前台畫面輸入訂單"><a href="#4-建立前台畫面輸入訂單" class="headerlink" title="4. 建立前台畫面輸入訂單"></a>4. 建立前台畫面輸入訂單</h3><p>在前面的文章中我們已經做好註冊&#x2F;登入功能 所以這邊我們就直接把登入後的id 給存到 session 裡 讓後續建訂單時可以存到 db</p>
+<p>[step]1[&#x2F;step] 在 laravel 預設的 <code>welcome.blade.php</code> 新增一個連結到下訂單處 同時把 <code>user_id</code> 給存入 session</p>
+<pre><code class="php">&lt;div class=&quot;links&quot;&gt;
+    &lt;a href=&quot;&#123;&#123; url('/OpayPayment/') &#125;&#125;&quot;&gt;雞排下單連結&lt;/a&gt;
+    &lt;a href=&quot;https://github.com/BenmrChen/&quot; TARGET=&quot;_blank&quot;&gt;GitHub&lt;/a&gt;
+    &lt;?php
+        if (isset(\Illuminate\Support\Facades\Auth::user()-&gt;id)) &#123;
+            session()-&gt;put(&#39;user_id&#39;, \Illuminate\Support\Facades\Auth::user()-&gt;id);
+        &#125;
+    ?&gt;
+&lt;/div&gt;
+</code></pre>
+<p><img src="/wp-content/uploads/2020/02/image-1581565311549.png" alt="file"></p>
+<p>[step]2[&#x2F;step] 新增 route 在 <code>web.php</code> 內</p>
+<pre><code class="php">Route::get(&#39;OpayPayment&#39;, function () &#123;
+    return view(&#39;OpayPayment&#39;);
+&#125;);
+</code></pre>
+<p>在 <code>api.php</code> 內</p>
+<pre><code class="php">Route::post(&#39;pay&#39;, &#39;OpayPaymentController@pay&#39;);
+Route::post(&#39;receive&#39;, &#39;OpayPaymentController@receive&#39;);
+</code></pre>
+<p>[step]3[&#x2F;step] 簡單生成一個下單頁面</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;OpayPayment Exercise&lt;/title&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form method=&quot;POST&quot; action=&quot;/api/pay&quot;&gt;
+    @csrf
+    &lt;p&gt;店舖名:
+        &lt;select name=&quot;shop_name&quot; id=&quot;&quot;&gt;
+            &lt;option value=&quot;TW_No_1&quot;&gt;台灣第一家雞排&lt;/option&gt;
+            &lt;option value=&quot;World_No_1&quot;&gt;世界第一家雞排&lt;/option&gt;
+        &lt;/select&gt;
+    &lt;/p&gt;
+    &lt;p&gt;雞排種類:
+        &lt;select name=&quot;product_name&quot; id=&quot;&quot;&gt;
+            &lt;option name=&quot;chrispy&quot; value=&quot;脆皮雞排&quot;&gt;脆皮雞排&lt;/option&gt;
+            &lt;option name=&quot;traditional&quot; value=&quot;傳統雞排&quot;&gt;傳統雞排&lt;/option&gt;
+        &lt;/select&gt;
+    &lt;/p&gt;
+    &lt;p&gt;數量:
+        &lt;select name=&quot;qty&quot; id=&quot;&quot;&gt;
+            &lt;option value=&quot;1&quot;&gt;1&lt;/option&gt;
+            &lt;option value=&quot;2&quot;&gt;2&lt;/option&gt;
+            &lt;option value=&quot;3&quot;&gt;3&lt;/option&gt;
+            &lt;option value=&quot;4&quot;&gt;4&lt;/option&gt;
+            &lt;option value=&quot;5&quot;&gt;5&lt;/option&gt;
+        &lt;/select&gt;
+    &lt;/p&gt;
+    &lt;input type=&quot;hidden&quot; value=&quot;http://547776ad.ngrok.io&quot; name=&quot;ClintBackURL&quot;&gt;
+    &lt;input type=&quot;hidden&quot; value=&quot;&lt;?php echo 
+</code></pre>
+<p>[step]4[&#x2F;step] 修改複製過到 controller 的 example 好讓 sdk 可以收到前台傳來的資料做結帳 下面要特別注意的點是 <code>ReturnURL</code> 是設定要讓歐付寶傳值回來的 URL 由於我是用 valet 當作 local 開發環境 所以可以直接在 command line 下</p>
+<pre><code>valet share
+</code></pre>
+<p>就會產生 <code>https://b30097bf.ngrok.io</code> 這個url 讓外部ip連 所以請不要跟我用一樣的 url 喔 更多 share 相關可以看官網說明 <a target="_blank" rel="noopener" href="https://laravel.com/docs/5.8/valet#sharing-sites">https://laravel.com/docs/5.8/valet#sharing-sites</a></p>
+<pre><code class="php"> public function pay(Request $request) &#123;
+        $MerchantTradeNo = &quot;Test&quot;.time();
+        // 存入訂單資料
+        $item[&#39;user_id&#39;] = $request-&gt;input(&#39;user_id&#39;);
+        $item[&#39;shop_name&#39;] = $request-&gt;input(&#39;shop_name&#39;);
+        $item[&#39;product_name&#39;] = $request-&gt;input(&#39;product_name&#39;);
+        $item[&#39;qty&#39;]  = $request-&gt;input(&#39;qty&#39;);
+        $item[&#39;price&#39;] = 65;
+        $item[&#39;order_name&#39;] = &#39;test_order&#39;;
+        $item[&#39;merchant_trade_no&#39;] = $MerchantTradeNo;
+        $order = Order::createOrder($item);
+
+        $price = 65;
+        $qty   = $request-&gt;input(&#39;qty&#39;);
+        $name  = $request-&gt;input(&#39;product_name&#39;);
+
+        try &#123;
+
+            $obj = new OpayAllInOne();
+
+            //服務參數
+            $obj-&gt;ServiceURL  = &quot;https://payment-stage.opay.tw/Cashier/AioCheckOut/V5&quot;;         //服務位置
+            $obj-&gt;HashKey     = &#39;5294y06JbISpM5x9&#39; ;                                            //測試用Hashkey，請自行帶入OPay提供的HashKey
+            $obj-&gt;HashIV      = &#39;v77hoKGq4kWxNNIS&#39; ;                                            //測試用HashIV，請自行帶入OPay提供的HashIV
+            $obj-&gt;MerchantID  = &#39;2000132&#39;;                                                      //測試用MerchantID，請自行帶入OPay提供的MerchantID
+            $obj-&gt;EncryptType = OpayEncryptType::ENC_SHA256;                                    //CheckMacValue加密類型，請固定填入1，使用SHA256加密
+
+            $obj-&gt;Send[&#39;ReturnURL&#39;]         = &#39;https://b30097bf.ngrok.io/api/receive&#39;; //付款完成通知回傳的網址
+            $obj-&gt;Send[&#39;MerchantTradeNo&#39;]   = $MerchantTradeNo;                                       //訂單編號
+            $obj-&gt;Send[&#39;MerchantTradeDate&#39;] = date(&#39;Y/m/d H:i:s&#39;);                                    //交易時間
+            $obj-&gt;Send[&#39;TotalAmount&#39;]       = $price * $qty;                                                   //交易金額
+            $obj-&gt;Send[&#39;TradeDesc&#39;]         = &quot;Hen好吃，史勾以!&quot;;                                        //交易描述
+            $obj-&gt;Send[&#39;ChoosePayment&#39;]     = OpayPaymentMethod::ALL;                                 //付款方式:全功能
+
+            //訂單的商品資料
+            array_push($obj-&gt;Send[&#39;Items&#39;], array(&#39;Name&#39; =&gt; $name, &#39;Price&#39; =&gt; (int)$price,
+                &#39;Currency&#39; =&gt; &quot;元&quot;, &#39;Quantity&#39; =&gt; (int) $qty, &#39;URL&#39; =&gt; &quot;&quot;));
+
+            //產生訂單(auto submit至OPay)
+            $obj-&gt;CheckOut();
+
+        &#125; catch (Exception $e) &#123;
+            echo $e-&gt;getMessage();
+        &#125;
+    &#125;
+</code></pre>
+<p>同時也修改 receive 在確認到歐付寶傳回來的 response 確認裡頭的 <code>CheckMacValue</code> 和我們這邊 server 生成的一致之後 再去把 order status 改成 1</p>
+<pre><code class="php">public function receive(Request $request) &#123;
+
+        try &#123;
+
+            $obj = new OpayAllInOne();
+
+            /* 服務參數 */
+            $obj-&gt;HashKey     = &#39;5294y06JbISpM5x9&#39; ;
+            $obj-&gt;HashIV      =  &#39;v77hoKGq4kWxNNIS&#39; ;
+            $obj-&gt;MerchantID  = &#39;2000132&#39;;
+            $obj-&gt;EncryptType = OpayEncryptType::ENC_SHA256;
+
+            /* 取得回傳參數 */
+           $arFeedback = $obj-&gt;CheckOutFeedback();
+            // 參數寫入檔案
+           if(true)
+           &#123;
+               $sLog_Path  = __DIR__.&#39;/sample_payment_return.log&#39; ; // LOG路徑
+               $sLog = &#39;+++++++++++++++++++++++++++++++++++++++ 接收回傳參數 &#39; . date(&#39;Y-m-d H:i:s&#39;) . &#39; ++++++++++++++++++++++++++++++++++++++++++++&#39; . &quot;\n&quot;;
+               $fp=fopen($sLog_Path, &quot;a+&quot;);
+               fputs($fp, $sLog);
+               fclose($fp);
+               Log::info($sLog);
+
+               $sLog_File =  print_r($arFeedback, true). &quot;\n&quot;;
+               $fp=fopen($sLog_Path, &quot;a+&quot;);
+               fputs($fp, $sLog_File);
+               fclose($fp);
+           &#125;
+            echo &#39;1OK&#39; ;
+            $MerchantTradeNo = $request[&#39;MerchantTradeNo&#39;]; // 取得MerchantTradeNo 當作是PK去更更新 order status
+            $status = Order::updateOrderStatus($MerchantTradeNo);
+
+        &#125; catch (Exception $e) &#123;
+            if(true)
+            &#123;
+                $sLog_Path  = __DIR__.&#39;/sample_payment_return.log&#39; ; // LOG路徑
+                $sLog = &#39;+++++++++++++++++++++++++++++++++++++++ 接收回傳參數(ERROR) &#39; . date(&#39;Y-m-d H:i:s&#39;) . &#39; ++++++++++++++++++++++++++++++++++++++++++++&#39; . &quot;\n&quot;;
+                $fp=fopen($sLog_Path, &quot;a+&quot;);
+                fputs($fp, $sLog);
+                fclose($fp);
+                Log::info($sLog);
+
+                $sLog_File =  $e-&gt;getMessage(). &quot;\n&quot;;
+                $fp=fopen($sLog_Path, &quot;a+&quot;);
+                fputs($fp, $sLog_File);
+                fclose($fp);
+            &#125;
+        &#125;
+    &#125;
+</code></pre>
+<h3 id="5-實際建立訂單以確認流程ok"><a href="#5-實際建立訂單以確認流程ok" class="headerlink" title="5. 實際建立訂單以確認流程ok"></a>5. 實際建立訂單以確認流程ok</h3><p>[step]1[&#x2F;step] 進入首頁 並點右上右登入 點選進入下單頁面 <img src="/wp-content/uploads/2020/02/image-1581565311549.png" alt="file"></p>
+<p>[step]2[&#x2F;step] 進入下單面後確認訂單 submit</p>
+<p>[step]3[&#x2F;step] 此時會導入歐付寶的頁面 裡面會有剛剛點選的雞排訂單 <img src="/wp-content/uploads/2020/02/image-1581568353485.png" alt="file"></p>
+<p>同時check 一下 db 裡頭有剛剛新建的訂單 可以發現</p>
+<pre><code>1. status = 0 ，代表還未付款
+2. merchant_trade_no 是剛剛生成的 當作是PK 
+(其實應該是要建關聯db 但這邊就當測試就好 直接用)
+</code></pre>
+<p><img src="/wp-content/uploads/2020/02/image-1581568434298.png" alt="file"></p>
+<p>[step]4[&#x2F;step] 登入並輸入信用卡 可以參考官網的介紹 <a target="_blank" rel="noopener" href="https://developers.opay.tw/AioCreditCard/CreateOrder">https://developers.opay.tw/AioCreditCard/CreateOrder</a></p>
+<p>[step]5[&#x2F;step] 完成訂單! 我們會收到以下畫面 <img src="/wp-content/uploads/2020/02/image-1581568700595.png" alt="file"></p>
+<p>同時再check一下db hen 好! <code>status = 1</code> ，代表已完成信用卡支付 <img src="/wp-content/uploads/2020/02/image-1581568785619.png" alt="file"></p>
+<p>讚! 完成!</p>
+<h2 id="系列文章"><a href="#系列文章" class="headerlink" title="系列文章"></a>系列文章</h2><p>最後附上系列文章</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/chickenfilletaffiliate-api-preface/">PHP + Laravel 雞排聯盟API實作: 前言</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/chickenfilletaffiliate-api-createmodel/">PHP + Laravel 雞排聯盟API實作: 產出 table 及可供操作的物件</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/chickenfilletaffiliate-api-crud">PHP + Laravel 雞排聯盟API實作: CRUD 增刪改查</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/php-laravel-chickenfillet-auth">PHP + Laravel 雞排聯盟API實作: 追加會員身份驗證</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/php-laravel-opay-api">PHP + Laravel 雞排聯盟API實作: 串接歐付寶金流API</a></li>
+</ol>
+<p>以及初學時看的書 推薦!</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/Laravel5-for-beginner">Laravel 5 for beginner 新手道場：優雅運用框架快速開發 PHP 網站</a></li>
+</ul>
+<p>還有gibhub連結</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/BenmrChen/ChickenFillet">https://github.com/BenmrChen/ChickenFillet</a></li>
+</ul>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2020/02/21/jquery-scrolltop/" title="jQuery 操作 DOM 並 scrollTop 跳轉至指定位置"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">Previous: jQuery 操作 DOM 並 scrollTop 跳轉至指定位置</span></a><a class="button is-default" href="/2020/02/12/python-pandas-tw-stock/" title="使用 Python Pandas 來抓取台股每日資訊"><span class="has-text-weight-semibold">Next: 使用 Python Pandas 來抓取台股每日資訊</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Haojen 2024</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/jquery-3.6.1.min.js"></script><script src="/js/jquery-fancybox.min.js"></script><script src="/js/img_zoom.js"></script><script src="/js/post.js"></script></body></html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html><html class="appearance-light" lang="en"><head><meta charset="UTF-8"><title>PHP + Laravel 雞排聯盟API實作: 追加會員身份驗證</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/style/common/jquery.fancybox.min.css"><script src="/js/highlight.pack.js"></script><meta name="description" content="前言身為一個後端攻城屍 沒事就是在寫驗證管權限什麼的 今天就是要來寫一個限權管理機制 好確保我們的雞排資料不會被奇怪的人亂改亂修
+好的 準備好就開始吧!
+增加註冊功能Laravel 很貼心地提供了快速的指令 可以直接生成前端畫面和設置權限的相關 Routes 指令如下:
+composer require laravel/ui --dev
+
+php artisan ui vue --auth
+
+
+
+這邊可以用Git看一下新增了什麼 
+可以得知新增了一個HomeController
+同時我們可以看一下web.php(管前端畫面的路由)  可以發現 Laravel 自動幫我們追加了一個/home的路由進去
+這邊我可以用command line看一下目前的路由狀況
+php artisan route:list
+
+ .."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Haojen's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">PHP + Laravel 雞排聯盟API實作: 追加會員身份驗證</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Click back to the top</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A2%9E%E5%8A%A0%E8%A8%BB%E5%86%8A%E5%8A%9F%E8%83%BD"><span class="toc-text">增加註冊功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Passport%E5%81%9A%E6%9C%83%E5%93%A1%E8%BA%AB%E4%BB%BD%E9%A9%97%E8%AD%89"><span class="toc-text">使用Passport做會員身份驗證</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B3%E8%AB%8B%E6%8E%88%E6%AC%8A"><span class="toc-text">申請授權</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A%E6%93%8D%E4%BD%9C%E8%B3%87%E6%BA%90%E9%9C%80%E9%A9%97%E8%AD%89%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-text">設定操作資源需驗證的方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0"><span class="toc-text">系列文章</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol></div><div class="column is-9"><header class="my-4"></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">PHP + Laravel 雞排聯盟API實作: 追加會員身份驗證</h1><time class="has-text-grey" datetime="2020-02-06T09:15:51.000Z">2020-02-06</time><article class="mt-2 post-content"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>身為一個後端攻城屍 沒事就是在寫驗證管權限什麼的 今天就是要來寫一個限權管理機制 好確保我們的雞排資料不會被奇怪的人亂改亂修</p>
+<p>好的 準備好就開始吧!</p>
+<h2 id="增加註冊功能"><a href="#增加註冊功能" class="headerlink" title="增加註冊功能"></a>增加註冊功能</h2><p>Laravel 很貼心地提供了快速的指令 可以直接生成前端畫面和設置權限的相關 Routes 指令如下:</p>
+<pre><code>composer require laravel/ui --dev
+
+php artisan ui vue --auth
+</code></pre>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580891570030.png" alt="file"></p>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580891533843.png" alt="file"></p>
+<p>這邊可以用<code>Git</code>看一下新增了什麼 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580891779576.png" alt="file"></p>
+<p>可以得知新增了一個<code>HomeController</code></p>
+<p>同時我們可以看一下<code>web.php</code>(管前端畫面的路由) <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580891924482.png" alt="file"> 可以發現 Laravel 自動幫我們追加了一個<code>/home</code>的路由進去</p>
+<p>這邊我可以用<code>command line</code>看一下目前的路由狀況</p>
+<pre><code>php artisan route:list
+</code></pre>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580892171443.png" alt="file"> 可以看到紅框框起來的地方就是這次新增的路由 基本的會員登錄驗證都已經在Laravel大大的幫助下完成了</p>
+<p>你可能會問，那DB勒? 沒問題! Laravel 在 new 專案出來的時候也已經自帶好了 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580892289887.png" alt="file"></p>
+<p>這個時候 只要進入我們用 Valet 架好的本地環境 就可以看到登錄&#x2F;註冊畫面囉 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580892389194.png" alt="file"></p>
+<p>超方便的! 輸入好資料後就可以註冊完成了</p>
+<p>下一步呢? 就是要來寫驗證會員身份啦!</p>
+<h2 id="使用Passport做會員身份驗證"><a href="#使用Passport做會員身份驗證" class="headerlink" title="使用Passport做會員身份驗證"></a>使用Passport做會員身份驗證</h2><p>建議可以先行服用看官方文件 安裝好官方推薦的passport做OAuth2驗證 就可以輕易地讓我們的API來使用Token驗證 user <a target="_blank" rel="noopener" href="https://laravel.com/docs/6.x/passport">https://laravel.com/docs/6.x/passport</a></p>
+<p>[step]1[&#x2F;step]</p>
+<pre><code>composer require laravel/passport
+</code></pre>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580892922190.png" alt="file"></p>
+<p>到<code>composer.json</code>就可以看到<code>passport</code>囉 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580892992305.png" alt="file"></p>
+<p>[step]2[&#x2F;step] 接著來讓<code>passport</code>幫我們加入相關的<code>table</code></p>
+<pre><code>php artisan migrate
+</code></pre>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580893046105.png" alt="file"></p>
+<p>可以看到<code>passport</code>加入了<code>client table</code>和<code>token table</code> 這個概念可以想像成白名單 也就是說 如果有人要來存取我們的API 首先 user 必須要被加到白名單內(client table) 接著在確認 user 是白名單的成員後 api 端才能核發 Token 給 user 以獲取會員的權限</p>
+<p>一般在做任何需要認證的請求時 比如說（我「想」要新增雞排店） 那麼就要先跟伺服器請求核發一組 Access Token(就是一段亂碼) 把這個 Token 附帶在請求中 就可以操作需要驗證的API (我要新增雞排-附帶有效的Token)</p>
+<p>[step]3[&#x2F;step] 創建加密需要的<code>公鑰</code>及<code>私鑰</code> 這主要是讓我們在接著可以安全產生 Access Token 使用方式在後面會做介紹</p>
+<pre><code>php artisan passport:install
+</code></pre>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580893971406.png" alt="file"></p>
+<p>[step]4[&#x2F;step] 設定<code>Passport</code> 有了以上的預備 接著我們要來做一些設定 把這個<code>passport</code>給引用到我們user的model中</p>
+<pre><code class="php">&lt;?php
+
+namespace App;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens; // 加這行
+
+class User extends Authenticatable
+&#123;
+    use HasApiTokens, Notifiable; // 加這行
+    use Notifiable;
+&#125;
+</code></pre>
+<p>這樣子我們就加入了 Passport 寫好的方法</p>
+<p>[step]5[&#x2F;step] 接著 AuthServiceProvider 中的 boot 方法中調用 Passport::routes 方法 這個方法會註冊必要的路由去核發、換發、撤銷 Token 以及請求客戶端的 id、secret 之類的路由</p>
+<pre><code class="php">&lt;?php
+
+namespace App\Providers;
+
+use App\ChickenFilletShop;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use Laravel\Passport\Passport;
+
+class AuthServiceProvider extends ServiceProvider
+&#123;
+    /**
+     * Register any authentication / authorization services.
+     *
+     * @return void
+     */
+    public function boot()
+    &#123;
+        $this-&gt;registerPolicies();
+
+        Passport::routes();  // 加這行
+    &#125;
+&#125;
+</code></pre>
+<p>完成後 就可以看到路由表以下 紅框處就是我們調用<code>passport</code>方法所新增的路由了! <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580894713292.png" alt="file"></p>
+<p>ps. <code>passport</code>核發的token預設是<code>1年</code>有效</p>
+<p>[step]6[&#x2F;step] 修改config</p>
+<p>讓我們到<code>config/auth.php</code>內</p>
+<pre><code class="php">&lt;? php
+    &#39;guards&#39; =&gt; [
+        &#39;web&#39; =&gt; [
+            &#39;driver&#39; =&gt; &#39;session&#39;,
+            &#39;provider&#39; =&gt; &#39;users&#39;,
+        ],
+
+        &#39;api&#39; =&gt; [
+            &#39;driver&#39; =&gt; &#39;passport&#39;, // 把原來的 token 改成 passport
+            &#39;provider&#39; =&gt; &#39;users&#39;,
+            &#39;hash&#39; =&gt; false,
+        ],
+    ],
+</code></pre>
+<h3 id="申請授權"><a href="#申請授權" class="headerlink" title="申請授權"></a>申請授權</h3><p>在上面的步驟中 我們安裝也設定好了<code>passport</code> 接下來就是要來使用它並設定權限了</p>
+<p>首先要提的是 Laravel 提供了4種不同的授權類型</p>
+<ol>
+<li>密碼授權</li>
+<li>授權碼授權</li>
+<li>個人授權</li>
+<li>同步授權</li>
+</ol>
+<p>而以下將對<code>密碼授權</code>進行說明</p>
+<p>如先前所說 在請求API，首先必須確認 user 在白名單(client table)內 這才有辦法使用<code>id</code>及<code>secret</code>來申請<code>Access Token</code> 接著才能拿著這個<code>Access Token</code>來請求API</p>
+<p>而當 User 在申請<code>Access Token</code>時 設定資料如下:</p>
+<pre><code>POST /oauth/token HTTP/1.1
+Content-type: application/x-www-form-urlencoded
+</code></pre>
+<p>須附帶資料如下:</p>
+<pre><code class="php">&lt;?php
+  &#39;grant_type&#39; =&gt; &#39;password&#39;, //告訴伺服器密碼授權
+  &#39;client_id&#39; =&gt; &#39;2&#39;, // 伺服器端會有一筆client ID資料，在安裝Passport 有新增一組，日後若有需求可再新增。
+  &#39;client_secret&#39; =&gt; &#39;Y9kRRtMX...&#39;,  //上面ID對應的 secret 值
+  &#39;username&#39; =&gt; &#39;goodchicken@gmail.com&#39;, // 登入哪個使用者
+  &#39;password&#39; =&gt; &#39;goodchicken@gmail.com&#39;, //密碼
+  &#39;scope&#39; =&gt; &#39;&#39;, //作用區
+</code></pre>
+<p>回傳的資料如下</p>
+<pre><code class="json"> &#123;
+    &quot;token_type&quot;: &quot;Bearer&quot;,
+    &quot;expires_in&quot;: 31622400,
+    &quot;access_token&quot;: &quot;eyJ0eXA...&quot;,
+    &quot;refresh_token&quot;: &quot;def502...&quot;
+&#125;
+</code></pre>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7-2020-01-08-%E4%B8%8A%E5%8D%8810.15.56-800x383.png" alt="access_token"> 這樣就取得了`Access Token` 代表授權成功了! 接著我們就可以使用這個`Access Token`來請求須要驗證的API了!</p>
+<p>但我們還沒有在系統中設定雞排resource成須要驗證才能操作 接下來就來完成這部份吧!</p>
+<h3 id="設定操作資源需驗證的方法"><a href="#設定操作資源需驗證的方法" class="headerlink" title="設定操作資源需驗證的方法"></a>設定操作資源需驗證的方法</h3><p>[step]1[&#x2F;step] 首先到這支檔案設定 `chickenFillet&#x2F;app&#x2F;Http&#x2F;Controllers&#x2F;ChickenFilletShopController.php`</p>
+<p>除了`index`(查詢清單)和`show`(查詢單一筆資料)外，其他的action都要驗證</p>
+<pre><code class="php">middleware(&#39;auth:api&#39;, [&#39;except&#39; =&gt; [&#39;index&#39;,&#39;show&#39;]]);
+    &#125;
+</code></pre>
+<p>[step]2[&#x2F;step] 使用`Postman`來刪資料試試 看看是不是隨便一個 user 都可以把我們家資料刪掉 <img src="https://growingdna.com/wp-content/uploads/2020/02/%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7-2020-01-08-%E4%B8%8A%E5%8D%889.52.29-529x400.png" alt="delete_without_auth"></p>
+<p>嗯看來是不行 會跳`401 error` 符合預期</p>
+<p>[step]3[&#x2F;step] 還記得上面申請的`Access Token`嗎?</p>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7-2020-01-08-%E4%B8%8A%E5%8D%8810.15.56-800x383.png" alt="access_token"></p>
+<p>我們把上面`Access Token`給copy下來 並貼到header再打一次 API header的寫法如下: <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580977790500.png" alt="file"></p>
+<p>response 如下 <img src="https://growingdna.com/wp-content/uploads/2020/02/%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7-2020-01-08-%E4%B8%8B%E5%8D%885.14.16-800x237.png" alt="delete"></p>
+<p>這樣子就成功囉!</p>
+<p>ps. 若出現`Could not get any response`字串的話 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580976758640.png" alt="file"></p>
+<p>那可能是因為在`Access Token`的時候貼錯 多貼了一行斷行 <img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580976814902.png" alt="file"></p>
+<p>刪了這段就好了 真的冏</p>
+<p>[step]3[&#x2F;step] Laravel 預設`Access Token`是一年有效 (若要自訂有效期，可以參考官方文件 <a target="_blank" rel="noopener" href="https://laravel.com/docs/5.8/passport#token-lifetimes">https://laravel.com/docs/5.8/passport#token-lifetimes</a>) 在失效後，可以使用`Refresh Token`來取得新的`Access Token` 其設定如下: header:</p>
+<pre><code>Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+</code></pre>
+<p>body</p>
+<pre><code>grant_type: refresh_token
+refresh_token: def5020054....
+client_id:2
+client_secret: Y9kRRtMXcUrn29z7HPlyPIuju2IJpaQWwdq6rECo
+scope:
+</code></pre>
+<p>完成後就可以看到新的<code>Access Token</code>囉</p>
+<p><img src="https://growingdna.com/wp-content/uploads/2020/02/image-1580979135809.png" alt="file"></p>
+<h2 id="系列文章"><a href="#系列文章" class="headerlink" title="系列文章"></a>系列文章</h2><p>最後附上系列文章</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/chickenfilletaffiliate-api-preface/">PHP + Laravel 雞排聯盟API實作: 前言</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/chickenfilletaffiliate-api-createmodel/">PHP + Laravel 雞排聯盟API實作: 產出 table 及可供操作的物件</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/chickenfilletaffiliate-api-crud">PHP + Laravel 雞排聯盟API實作: CRUD 增刪改查</a></li>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/php-laravel-chickenfillet-auth">PHP + Laravel 雞排聯盟API實作: 追加會員身份驗證</a></li>
+</ol>
+<p>以及初學時看的書 推薦!</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://growingdna.com/Laravel5-for-beginner">Laravel 5 for beginner 新手道場：優雅運用框架快速開發 PHP 網站</a></li>
+</ul>
+<p>還有gibhub連結</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/BenmrChen/ChickenFillet">https://github.com/BenmrChen/ChickenFillet</a></li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><p><a target="_blank" rel="noopener" href="https://laravel.com/docs/6.x/authentication">https://laravel.com/docs/6.x/authentication</a> <a target="_blank" rel="noopener" href="https://learnku.com/laravel/t/10488/could-not-get-any-response">https://learnku.com/laravel/t/10488/could-not-get-any-response</a></p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2020/02/12/python-pandas-tw-stock/" title="使用 Python Pandas 來抓取台股每日資訊"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">Previous: 使用 Python Pandas 來抓取台股每日資訊</span></a><a class="button is-default" href="/2020/02/03/python-pandas-intro/" title="應用 Python 於圖表數據：Pandas"><span class="has-text-weight-semibold">Next: 應用 Python 於圖表數據：Pandas</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Haojen 2024</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/jquery-3.6.1.min.js"></script><script src="/js/jquery-fancybox.min.js"></script><script src="/js/img_zoom.js"></script><script src="/js/post.js"></script></body></html>

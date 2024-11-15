@@ -1,0 +1,230 @@
+<!DOCTYPE html><html class="appearance-light" lang="en"><head><meta charset="UTF-8"><title>PHP 語法筆記</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/style/common/jquery.fancybox.min.css"><script src="/js/highlight.pack.js"></script><meta name="description" content="Basic常數 constantdefine(&amp;quot;GREETING&amp;quot;, &amp;quot;Welcome to W3Schools.com!&amp;quot;);
+echo GREETING;
+
+switch// switch + case + break + default
+$favcolor = &amp;quot;red&amp;quot;;
+
+switch ($favcolor) &amp;#123;
+    case &amp;quot;red&amp;quot;:
+        echo &amp;quot;Your favorite color is red!&amp;quot;;
+        break;
+    default:
+        echo &amp;quot;Your favorite color is neither re.."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Haojen's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">PHP 語法筆記</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Click back to the top</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Basic"><span class="toc-text">Basic</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E6%95%B8-constant"><span class="toc-text">常數 constant</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#switch"><span class="toc-text">switch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Loop"><span class="toc-text">Loop</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#While-loop"><span class="toc-text">While loop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Do-while-loop"><span class="toc-text">Do while loop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#For-loop"><span class="toc-text">For loop</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Array"><span class="toc-text">Array</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Sorting-%E6%8E%92%E5%BA%8F%E6%96%B9%E6%B3%95"><span class="toc-text">Sorting 排序方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Superglobals"><span class="toc-text">Superglobals</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#PHP-advanced"><span class="toc-text">PHP advanced</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Date"><span class="toc-text">Date</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#include-and-require"><span class="toc-text">include and require</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#file-handling"><span class="toc-text">file handling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Cookie"><span class="toc-text">Cookie</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#session"><span class="toc-text">session</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#json"><span class="toc-text">json</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OOP"><span class="toc-text">OOP</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Classes-Objects"><span class="toc-text">Classes&#x2F;Objects</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#constructor-%E5%9C%A8new%E9%80%99%E5%80%8Bclass%E5%87%BA%E4%BE%86%E7%9A%84%E6%99%82%E5%80%99%E8%87%AA%E5%8B%95call"><span class="toc-text">constructor 在new這個class出來的時候自動call</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#destructor-%E6%9C%83%E7%B5%90%E6%9D%9F%E7%9A%84%E6%99%82%E5%80%99%E8%87%AA%E5%8B%95call%E9%80%99%E5%80%8Bfunction-%E4%BD%9C%E7%94%A8-%E6%B8%9B%E5%B0%91code%E9%87%8F"><span class="toc-text">destructor 會結束的時候自動call這個function; 作用: 減少code量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Access-Modifiers-Visibility-%E4%B8%89%E7%A8%AE-public-protected-private"><span class="toc-text">Access Modifiers: Visibility 三種-&gt;public&#x2F;protected&#x2F;private</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Inheritance-%E7%B9%BC%E6%89%BF"><span class="toc-text">Inheritance 繼承</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A5%E4%B8%8A%E8%B3%87%E6%96%99%E4%BE%86%E8%87%AA-https-www-w3schools-com-php-default-asp"><span class="toc-text">以上資料來自 https:&#x2F;&#x2F;www.w3schools.com&#x2F;php&#x2F;default.asp</span></a></li></ol></div><div class="column is-9"><header class="my-4"></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">PHP 語法筆記</h1><time class="has-text-grey" datetime="2019-11-18T01:26:03.000Z">2019-11-18</time><article class="mt-2 post-content"><h1 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h1><h2 id="常數-constant"><a href="#常數-constant" class="headerlink" title="常數 constant"></a>常數 constant</h2><pre><code class="php">define(&quot;GREETING&quot;, &quot;Welcome to W3Schools.com!&quot;);
+echo GREETING;
+</code></pre>
+<h2 id="switch"><a href="#switch" class="headerlink" title="switch"></a>switch</h2><pre><code class="php">// switch + case + break + default
+$favcolor = &quot;red&quot;;
+
+switch ($favcolor) &#123;
+    case &quot;red&quot;:
+        echo &quot;Your favorite color is red!&quot;;
+        break;
+    default:
+        echo &quot;Your favorite color is neither red, blue, nor green!&quot;;
+&#125;
+</code></pre>
+<h2 id="Loop"><a href="#Loop" class="headerlink" title="Loop"></a>Loop</h2><h3 id="While-loop"><a href="#While-loop" class="headerlink" title="While loop"></a>While loop</h3><pre><code class="php">// 先assign一個變數 然後再去做事
+$x = 1;
+
+while($x &lt;= 5) &#123;
+    echo &quot;The number is: $x &lt;br&gt;&quot;;
+    $x++;
+&#125;
+</code></pre>
+<h3 id="Do-while-loop"><a href="#Do-while-loop" class="headerlink" title="Do while loop"></a>Do while loop</h3><pre><code class="php">// 無論發生啥事 會先做do的內容 然後再跑迴圈
+$x = 1;
+
+do &#123;
+    echo &quot;The number is: $x &lt;br&gt;&quot;;
+    $x++;
+&#125; while ($x &lt;= 5);
+</code></pre>
+<h3 id="For-loop"><a href="#For-loop" class="headerlink" title="For loop"></a>For loop</h3><pre><code class="php">// 用分號隔開
+for ($x = 0; $x &lt;= 10; $x++) &#123;
+    echo &quot;The number is: $x &lt;br&gt;&quot;;
+&#125;
+</code></pre>
+<h2 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h2><h3 id="Sorting-排序方法"><a href="#Sorting-排序方法" class="headerlink" title="Sorting 排序方法"></a>Sorting 排序方法</h3><pre><code class="php">sort() - sort arrays in ascending order
+rsort() - sort arrays in descending order
+asort() - sort associative arrays in ascending order, according to the value
+ksort() - sort associative arrays in ascending order, according to the key
+arsort() - sort associative arrays in descending order, according to the value
+krsort() - sort associative arrays in descending order, according to the key
+
+/*
+a 為 value
+k 為 key
+r 是 降序
+- 是 升序
+*/
+</code></pre>
+<h2 id="Superglobals"><a href="#Superglobals" class="headerlink" title="Superglobals"></a>Superglobals</h2><pre><code class="php">// 列出常用的
+$GLOBALS
+$_SERVER // 如果要取得server相關的資料 比如說ip/host server/之類的話可以用
+$_REQUEST
+$_POST
+$_GET
+$_FILES
+$_ENV
+$_COOKIE
+$_SESSION
+</code></pre>
+<h1 id="PHP-advanced"><a href="#PHP-advanced" class="headerlink" title="PHP advanced"></a>PHP advanced</h1><h2 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h2><pre><code class="php">date(format,timestamp)
+// format  Required. Specifies the format of the timestamp
+// timestamp Optional. Specifies a timestamp. Default is the current date and time
+</code></pre>
+<h2 id="include-and-require"><a href="#include-and-require" class="headerlink" title="include and require"></a>include and require</h2><pre><code class="php">// require 會在錯誤時停掉 但 include不會
+// require will produce a fatal error (E_COMPILE_ERROR) and stop the script
+// include will only produce a warning (E_WARNING) and the script will continue
+&lt;html&gt;
+&lt;body&gt;
+
+&lt;h1&gt;Welcome to my home page!&lt;/h1&gt;
+&lt;p&gt;Some text.&lt;/p&gt;
+&lt;p&gt;Some more text.&lt;/p&gt;
+&lt;?php include &#39;footer.php&#39;;?&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h2 id="file-handling"><a href="#file-handling" class="headerlink" title="file handling"></a>file handling</h2><p>PHP Read File - fread() PHP Open File - fopen() PHP Close File - fclose() PHP Write to File - fwrite()</p>
+<h2 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h2><p><code>setcookie(name, value, expire, path, domain, secure, httponly);</code></p>
+<pre><code class="php">$cookie_name = &quot;user&quot;;
+$cookie_value = &quot;John Doe&quot;;
+setcookie($cookie_name, $cookie_value, time() + (86400 * 30), &quot;/&quot;); // 86400 = 1 day
+</code></pre>
+<h2 id="session"><a href="#session" class="headerlink" title="session"></a>session</h2><pre><code class="php">&lt;?php
+// Start the session
+session_start();
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+
+&lt;?php
+// Set session variables
+$_SESSION[&quot;favcolor&quot;] = &quot;green&quot;;
+$_SESSION[&quot;favanimal&quot;] = &quot;cat&quot;;
+echo &quot;Session variables are set.&quot;;
+?&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h2 id="json"><a href="#json" class="headerlink" title="json"></a>json</h2><p>PHP - json_encode()</p>
+<pre><code class="php">$age = array(&quot;Peter&quot;=&gt;35, &quot;Ben&quot;=&gt;37, &quot;Joe&quot;=&gt;43);
+echo json_encode($age); // 因為json 其實就是一個string 所以可以直接echo出來
+</code></pre>
+<p>PHP - json_decode()</p>
+<pre><code class="php">$jsonobj = &#39;&#123;&quot;Peter&quot;:35,&quot;Ben&quot;:37,&quot;Joe&quot;:43&#125;&#39;;
+var_dump(json_decode($jsonobj, true));
+</code></pre>
+<p>取得 decoded的json 方法</p>
+<pre><code class="php">// 第一種
+$jsonobj = &#39;&#123;&quot;Peter&quot;:35,&quot;Ben&quot;:37,&quot;Joe&quot;:43&#125;&#39;;
+
+$obj = json_decode($jsonobj);
+
+echo $obj-&gt;Peter;
+echo $obj-&gt;Ben;
+echo $obj-&gt;Joe;
+
+// 第二種
+$jsonobj = &#39;&#123;&quot;Peter&quot;:35,&quot;Ben&quot;:37,&quot;Joe&quot;:43&#125;&#39;;
+
+$arr = json_decode($jsonobj, true);
+
+echo $arr[&quot;Peter&quot;];
+echo $arr[&quot;Ben&quot;];
+echo $arr[&quot;Joe&quot;];
+</code></pre>
+<h1 id="OOP"><a href="#OOP" class="headerlink" title="OOP"></a>OOP</h1><h2 id="Classes-Objects"><a href="#Classes-Objects" class="headerlink" title="Classes&#x2F;Objects"></a>Classes&#x2F;Objects</h2><p>class 是一個類 而new出來就變一個一個的objects</p>
+<pre><code class="php">class Fruit &#123;
+  // Properties 屬性
+  public $name;
+  public $color;
+
+  // Methods 方法
+  function set_name($name) &#123;
+    $this-&gt;name = $name;
+  &#125;
+  function get_name() &#123;
+    return $this-&gt;name;
+  &#125;
+&#125;
+
+$apple = new Fruit();
+$banana = new Fruit();
+$apple-&gt;set_name(&#39;Apple&#39;);
+$banana-&gt;set_name(&#39;Banana&#39;);
+
+echo $apple-&gt;get_name();
+echo &quot;&lt;br&gt;&quot;;
+echo $banana-&gt;get_name();
+</code></pre>
+<h2 id="constructor-在new這個class出來的時候自動call"><a href="#constructor-在new這個class出來的時候自動call" class="headerlink" title="constructor 在new這個class出來的時候自動call"></a>constructor 在new這個class出來的時候自動call</h2><pre><code class="php">class Fruit &#123;
+  public $name;
+  public $color;
+
+  function __construct($name) &#123; // 這個_construct會把new object出來時的參數帶過來
+    $this-&gt;name = $name;
+  &#125;
+  function get_name() &#123;
+    return $this-&gt;name;
+  &#125;
+&#125;
+
+$apple = new Fruit(&quot;Apple&quot;);
+echo $apple-&gt;get_name();
+?
+</code></pre>
+<h2 id="destructor-會結束的時候自動call這個function-作用-減少code量"><a href="#destructor-會結束的時候自動call這個function-作用-減少code量" class="headerlink" title="destructor 會結束的時候自動call這個function; 作用: 減少code量"></a>destructor 會結束的時候自動call這個function; 作用: 減少code量</h2><pre><code class="php">class Fruit &#123;
+  public $name;
+  public $color;
+
+  function __construct($name) &#123;
+    $this-&gt;name = $name;
+  &#125;
+  function __destruct() &#123;
+    echo &quot;The fruit is &#123;$this-&gt;name&#125;.&quot;;
+  &#125;
+&#125;
+
+$apple = new Fruit(&quot;Apple&quot;);
+</code></pre>
+<h2 id="Access-Modifiers-Visibility-三種-public-protected-private"><a href="#Access-Modifiers-Visibility-三種-public-protected-private" class="headerlink" title="Access Modifiers: Visibility 三種-&gt;public&#x2F;protected&#x2F;private"></a>Access Modifiers: Visibility 三種-&gt;public&#x2F;protected&#x2F;private</h2><pre><code>- public - the property or method can be accessed from everywhere. This is default
+到處都可call, 預設是這個
+
+- protected - the property or method can be accessed within the class and by classes derived from that class
+只有在該class和繼承的class可call (new 出來的object不算; 同理 繼承的class所new出來的object也不行)
+
+- private - the property or method can ONLY be accessed within the class
+只有該class可call 不能被繼承
+</code></pre>
+<h2 id="Inheritance-繼承"><a href="#Inheritance-繼承" class="headerlink" title="Inheritance 繼承"></a>Inheritance 繼承</h2><pre><code class="php">class Fruit &#123;
+  public $name;
+  public $color;
+  public function __construct($name, $color) &#123;
+    $this-&gt;name = $name;
+    $this-&gt;color = $color;
+  &#125;
+  protected function intro() &#123;
+    echo &quot;The fruit is &#123;$this-&gt;name&#125; and the color is &#123;$this-&gt;color&#125;.&quot;;
+  &#125;
+&#125;
+
+class Strawberry extends Fruit &#123; // 繼承就是用extends
+  public function message() &#123;
+    echo &quot;Am I a fruit or a berry? &quot;;
+  &#125;
+  $this-&gt;intro(); // 這樣子就可以使用protected的function
+&#125;
+
+// Try to call all three methods from outside class
+$strawberry = new Strawberry(&quot;Strawberry&quot;, &quot;red&quot;);  // OK. __construct() is public
+$strawberry-&gt;message(); // OK. message() is public
+$strawberry-&gt;intro(); // ERROR. intro() is protected
+</code></pre>
+<h1 id="以上資料來自-https-www-w3schools-com-php-default-asp"><a href="#以上資料來自-https-www-w3schools-com-php-default-asp" class="headerlink" title="以上資料來自 https://www.w3schools.com/php/default.asp"></a>以上資料來自 <a target="_blank" rel="noopener" href="https://www.w3schools.com/php/default.asp">https://www.w3schools.com/php/default.asp</a></h1></article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/11/19/long-term-with-value-on-investment/" title="投資最重要的事：長期且有價值"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">Previous: 投資最重要的事：長期且有價值</span></a><a class="button is-default" href="/2019/11/17/how-to-build-pre-conscious/" title="元認知能力：如何培養篇"><span class="has-text-weight-semibold">Next: 元認知能力：如何培養篇</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Haojen 2024</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/jquery-3.6.1.min.js"></script><script src="/js/jquery-fancybox.min.js"></script><script src="/js/img_zoom.js"></script><script src="/js/post.js"></script></body></html>

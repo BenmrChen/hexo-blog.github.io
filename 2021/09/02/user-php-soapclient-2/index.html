@@ -1,0 +1,109 @@
+<!DOCTYPE html><html class="appearance-light" lang="en"><head><meta charset="UTF-8"><title>用 PHP 實作 Web Service－一次搞懂 XML、SOAP、WSDL (下)</title><meta name="description" content="May the Force be with you"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><!-- End Google Analytics -->
+<!-- Baidu Analytics --><!-- End Baidu Analytics --><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><link rel="stylesheet" href="/style/common/jquery.fancybox.min.css"><script src="/js/highlight.pack.js"></script><meta name="description" content="實作有了上文的名詞解釋 我們總算可以開始來實作了 以下將以 PHP 的 SoapClient 為例 說明怎麼用這個 class 來對 server 端發送 request 做 XML 格式的資料交換
+Contruct根據官方說明 (https://www.php.net/manual/en/soapclient.construct.php) SoapClient::__construct 可以是 WSDL 或 non-WSDL mode 的 以下將以 WSDL 為例
+官方裡有提到
+public SoapClient::__construct(?string $wsdl, array $options = [])
+
+可以到有兩個要素: WSDL 和 options
+WSDL就是 WSDL 的位置 可能放在遠端.."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+</head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">Haojen's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">用 PHP 實作 Web Service－一次搞懂 XML、SOAP、WSDL (下)</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Click back to the top</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">Home</a></h3><h3 class="is-inline-block"><a href="/about">About</a></h3><h3 class="is-inline-block"><a href="/archives">Archives</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%A6%E4%BD%9C"><span class="toc-text">實作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Contruct"><span class="toc-text">Contruct</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WSDL"><span class="toc-text">WSDL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#options"><span class="toc-text">options</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#setSoapHeaders"><span class="toc-text">setSoapHeaders</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%91%BC%E5%8F%AB-function"><span class="toc-text">呼叫 function</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="toc-text">參考資料</span></a></li></ol></div><div class="column is-9"><header class="my-4"></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">用 PHP 實作 Web Service－一次搞懂 XML、SOAP、WSDL (下)</h1><time class="has-text-grey" datetime="2021-09-02T09:56:35.000Z">2021-09-02</time><article class="mt-2 post-content"><h1 id="實作"><a href="#實作" class="headerlink" title="實作"></a>實作</h1><p>有了<a target="_blank" rel="noopener" href="https://growingdna.com/user-php-soapclient-1/">上文的名詞解釋</a> 我們總算可以開始來實作了 以下將以 PHP 的 SoapClient 為例 說明怎麼用這個 class 來對 server 端發送 request 做 XML 格式的資料交換</p>
+<h2 id="Contruct"><a href="#Contruct" class="headerlink" title="Contruct"></a>Contruct</h2><p>根據官方說明 (<a target="_blank" rel="noopener" href="https://www.php.net/manual/en/soapclient.construct.php">https://www.php.net/manual/en/soapclient.construct.php</a>) <code>SoapClient::__construct</code> 可以是 WSDL 或 non-WSDL mode 的 以下將以 WSDL 為例</p>
+<p>官方裡有提到</p>
+<pre><code>public SoapClient::__construct(?string $wsdl, array $options = [])
+</code></pre>
+<p>可以到有兩個要素: WSDL 和 options</p>
+<h3 id="WSDL"><a href="#WSDL" class="headerlink" title="WSDL"></a>WSDL</h3><p>就是 WSDL 的位置 可能放在遠端也可能掛在 local 內</p>
+<ul>
+<li><p>若放在遠端</p>
+<ul>
+<li>放遠端的 URL</li>
+<li>例: <a target="_blank" rel="noopener" href="https://domain.net/example?WSDL">https://domain.net/example?WSDL</a> (注意這個最後的 <code>?WSDL</code> 很重要 server 端的 url 結尾不是 <code>.wsdl</code> 的話 就得改成這樣 原因不明 我之前就是沒放所以 GG 了)</li>
+</ul>
+</li>
+<li><p>若放在 local</p>
+<ul>
+<li>放你 local 的絕對路徑</li>
+<li>例: &#x2F;your&#x2F;path&#x2F;to&#x2F;file.xml</li>
+</ul>
+</li>
+</ul>
+<h3 id="options"><a href="#options" class="headerlink" title="options"></a>options</h3><p>這個選項就多了 比較重要的應該是 <code>stream_context</code> 和 <code>trace</code> 這邊就可以設定一下 SSL 協定 例:</p>
+<pre><code class="php">$streamContext = [
+            &quot;ssl&quot; =&gt; [
+                &quot;verify_peer&quot; =&gt; false,
+                &quot;verify_peer_name&quot; =&gt; false
+            ]
+        ];
+// 使用 `stream_context_create` 這個 func 來建 streamContext 物件，trace 開起來後有利之後看 log        
+$client = new SoapClient($url, [&#39;stream_context&#39; =&gt; stream_context_create($streamContext), 
+                                &#39;trace&#39; =&gt; 1]);        
+</code></pre>
+<p>註: 如果在發送 SOAP 時也要在 http header 塞一些東西 (比如說 token 之類的) 也要特別寫在 stream_context 裡面</p>
+<p>所以上面的例子可改寫成</p>
+<pre><code class="php">$httpHeader = &#39;token: 123456&#39;;
+$streamContext = [
+            &quot;ssl&quot; =&gt; [
+                &quot;verify_peer&quot; =&gt; false,
+                &quot;verify_peer_name&quot; =&gt; false
+            ],
+            // 把這個塞進來，其他的不變
+            &#39;http&#39; =&gt; [
+                &#39;header&#39; =&gt; $httpHeader, 
+            ]
+        ];
+$client = new SoapClient($url, [&#39;stream_context&#39; =&gt; stream_context_create($streamContext), 
+                                &#39;trace&#39; =&gt; 1]);        
+</code></pre>
+<h2 id="setSoapHeaders"><a href="#setSoapHeaders" class="headerlink" title="setSoapHeaders"></a>setSoapHeaders</h2><p>SOAP 當然也有自己的 header 要處理 所以會使用到這個 func</p>
+<p>例:</p>
+<pre><code class="php">$auth = array(
+        &#39;UserName&#39;=&gt;&#39;USERNAME&#39;,
+        &#39;Password&#39;=&gt;&#39;PASSWORD&#39;,
+        &#39;SystemId&#39;=&gt; array(&#39;_&#39;=&gt;&#39;DATA&#39;,&#39;Param&#39;=&gt;&#39;PARAM&#39;),
+        );
+</code></pre>
+<h2 id="呼叫-function"><a href="#呼叫-function" class="headerlink" title="呼叫 function"></a>呼叫 function</h2><p>最後當然就是呼叫 WSDL 裡定義的 func 來 call SOAP 啦 這邊就是根據文件或 WSDL 裡寫的 func 來做呼叫</p>
+<p>所以整段code 的樣貌會變成:</p>
+<pre><code class="php">// 宣告目的 url
+$url = &#39;https://domain.net/example?WSDL&#39;;
+
+// 宣告 httpHeader，並塞到 streamContext 裡
+$httpHeader = &#39;token: 123456&#39;;
+$streamContext = [
+            &quot;ssl&quot; =&gt; [
+                &quot;verify_peer&quot; =&gt; false,
+                &quot;verify_peer_name&quot; =&gt; false
+            ],
+            // 把這個塞進來，其他的不變
+            &#39;http&#39; =&gt; [
+                &#39;header&#39; =&gt; $httpHeader, 
+            ]
+        ];
+// 使用上述的資料 new 一個 SoapClient 出來        
+$client = new SoapClient($url, [&#39;stream_context&#39; =&gt; stream_context_create($streamContext), 
+                                &#39;trace&#39; =&gt; 1]);   
+
+// 在 soapHeader 裡加入需要的資料
+$auth = array(
+        &#39;UserName&#39;=&gt;&#39;USERNAME&#39;,
+        &#39;Password&#39;=&gt;&#39;PASSWORD&#39;,
+        &#39;SystemId&#39;=&gt; array(&#39;_&#39;=&gt;&#39;DATA&#39;,&#39;Param&#39;=&gt;&#39;PARAM&#39;),
+        );
+$header = new SoapHeader(&#39;NAMESPACE&#39;,&#39;Auth&#39;, $auth, false);
+$client-&gt;__setSoapHeaders($header);
+
+// 假設在 body 裡面是被說明這次呼叫的目的
+$soapBody = [
+    &#39;action&#39; =&gt; &#39;login&#39;
+];
+
+// 根據文件以及當下的情境，我們要去執行 SOAP 裡面的 login 這個 func
+$function = &#39;login&#39;;
+
+// 執行這個 func 同時使用剛宣告的 soapBody
+$response = $client-&gt;function($soapBody);
+</code></pre>
+<p>以上這樣 就完成了一個簡單的 SOAP 呼叫了</p>
+<p>如果有任何問題 歡迎留言詢問 希望這篇文章有幫助到你~!</p>
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><p><a target="_blank" rel="noopener" href="http://yes.nctu.edu.tw/Lecture/NewTech/C05/WebServices/Web%20Services%E4%BB%8B%E7%B4%B9.htm">http://yes.nctu.edu.tw/Lecture/NewTech/C05/WebServices/Web%20Services%E4%BB%8B%E7%B4%B9.htm</a> <a target="_blank" rel="noopener" href="https://dotblogs.com.tw/marcus116/2011/08/28/34524">https://dotblogs.com.tw/marcus116/2011/08/28/34524</a> <a target="_blank" rel="noopener" href="https://morosedog.gitlab.io/technology-20200226-tech-3/">https://morosedog.gitlab.io/technology-20200226-tech-3/</a> <a target="_blank" rel="noopener" href="https://www.w3schools.com/xml/xml_soap.asp">https://www.w3schools.com/xml/xml_soap.asp</a> <a target="_blank" rel="noopener" href="https://www.rusnake.com/2016/08/12/php-soapclient-%E9%80%A3%E6%8E%A5-https-%E7%9A%84-webservice/">https://www.rusnake.com/2016/08/12/php-soapclient-%E9%80%A3%E6%8E%A5-https-%E7%9A%84-webservice/</a> <a target="_blank" rel="noopener" href="https://www.php.net/manual/en/class.soapclient.php">https://www.php.net/manual/en/class.soapclient.php</a> <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Web%E6%9C%8D%E5%8A%A1">https://zh.wikipedia.org/wiki/Web%E6%9C%8D%E5%8A%A1</a></p>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2022/02/21/what-is-genesis-block/" title="創世區塊是什麼？"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">Previous: 創世區塊是什麼？</span></a><a class="button is-default" href="/2021/08/11/user-php-soapclient-1/" title="用 PHP 實作 Web Service－一次搞懂 XML、SOAP、WSDL (上)"><span class="has-text-weight-semibold">Next: 用 PHP 實作 Web Service－一次搞懂 XML、SOAP、WSDL (上)</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="Haojen/Claudia-theme-blog" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><a title="twitter" target="_blank" rel="noopener nofollow" href="//twitter.com//"><i class="iconfont icon-twitter"></i></a><!-- Github--><a title="github" target="_blank" rel="noopener nofollow" href="//github.com/haojen"><i class="iconfont icon-github"></i></a><!-- Ins--><a title="instagram" target="_blank" rel="noopener nofollow" href="//www.instagram.com//"><i class="iconfont icon-ins"></i></a><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--><a title="facebook" target="_blank" rel="noopener nofollow" href="//www.facebook.com//"><i class="iconfont icon-tian7_facebook"></i></a></section><p><span>Copyright ©</span><span> Haojen 2024</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" target="_blank" rel="noopener" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" target="_blank" rel="noopener" href="https://github.com/haojen/hexo-theme-Claudia" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span></span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/jquery-3.6.1.min.js"></script><script src="/js/jquery-fancybox.min.js"></script><script src="/js/img_zoom.js"></script><script src="/js/post.js"></script></body></html>
