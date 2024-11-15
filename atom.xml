@@ -23,13 +23,13 @@
     <published>2024-11-15T10:57:13.000Z</published>
     <updated>2024-11-15T16:38:04.495Z</updated>
     
-    <content type="html"><![CDATA[<p>測試<br><img src="/marketplace_container.png" alt="測測測"><br><img src="/Cat03.jpg" alt="測測測"></p><pre><code class="php">$test = &#39;111&#39;;</code></pre>]]></content>
+    <content type="html"><![CDATA[<p>測試<br><img src="/2024/11/15/By-Hexo/marketplace_container.png" alt="測測測"><br><img src="/2024/11/15/By-Hexo/Cat03.jpg" alt="測測測"></p><pre><code class="php">$test = &#39;111&#39;;</code></pre>]]></content>
     
     
       
       
-    <summary type="html">&lt;p&gt;測試&lt;br&gt;&lt;img src=&quot;/marketplace_container.png&quot; alt=&quot;測測測&quot;&gt;&lt;br&gt;&lt;img src=&quot;/Cat03.jpg&quot; alt=&quot;測測測&quot;&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;php&quot;&gt;$test = &amp;#39;111&amp;#3</summary>
+    <summary type="html">&lt;p&gt;測試&lt;br&gt;&lt;img src=&quot;/2024/11/15/By-Hexo/marketplace_container.png&quot; alt=&quot;測測測&quot;&gt;&lt;br&gt;&lt;img src=&quot;/2024/11/15/By-Hexo/Cat03.jpg&quot; alt=&quot;測測測&quot;&gt;&lt;/p&gt;
+&lt;pre</summary>
       
     
     
@@ -145,9 +145,9 @@
     
     
     
-    <category term="技術筆記" scheme="http://example.com/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/"/>
-    
     <category term="投資理財" scheme="http://example.com/categories/%E6%8A%95%E8%B3%87%E7%90%86%E8%B2%A1/"/>
+    
+    <category term="技術筆記" scheme="http://example.com/categories/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/"/>
     
     
   </entry>
