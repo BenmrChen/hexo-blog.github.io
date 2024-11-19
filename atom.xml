@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-11-18T17:10:55.268Z</updated>
+  <updated>2024-11-19T03:03:49.157Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用 VMware Fusion Pro 在 Mac 裝 Windows 打遊戲</title>
+    <link href="http://example.com/2024/11/19/vmfusion-windows-on-mac/"/>
+    <id>http://example.com/2024/11/19/vmfusion-windows-on-mac/</id>
+    <published>2024-11-19T02:59:36.000Z</published>
+    <updated>2024-11-19T03:03:49.157Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/images/vmfusion.webp" alt="vmfusion"></p><p>最近玩 Mac 版的 Card Shark 到一半竟然中文字幕會不見<br>出老千要用英文也太難了吧&#x3D; &#x3D;<br>剛好 VMware Fusion 免費了 直接研究一波</p><p>結果卡在奇怪的地方 這邊簡單紀錄一下</p><span id="more"></span><h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><ol><li>註冊 BROADCOM 後下載 VMware Fusion</li><li>下載 arm64 windows 11 iso 檔</li><li>掛 iso 檔到 VMware Fusion 後安裝</li><li>設置網路時會卡住 此時要按 Shift+F10 打開 cmd 後打 oobe\bypassnro</li><li>找到 install VMware Tools 安裝驅動程式</li><li>調整 VM 要用的核心數、RAM</li></ol><h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul><li>ISO 檔<br><a href="https://massgrave.dev/windows_arm_links">https://massgrave.dev/windows_arm_links</a></li><li>網路設定解法<br><a href="https://www.intel.com.tw/content/www/tw/zh/support/articles/000092599/intel-nuc.html">https://www.intel.com.tw/content/www/tw/zh/support/articles/000092599/intel-nuc.html</a></li><li>安裝流程<br><a href="https://www.youtube.com/watch?v=EBpa6fguOO0">https://www.youtube.com/watch?v=EBpa6fguOO0</a></li></ul>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/images/vmfusion.webp&quot; alt=&quot;vmfusion&quot;&gt;&lt;/p&gt;
+&lt;p&gt;最近玩 Mac 版的 Card Shark 到一半竟然中文字幕會不見&lt;br&gt;出老千要用英文也太難了吧&amp;#x3D; &amp;#x3D;&lt;br&gt;剛好 VMware Fusion 免費了 直接研究一波&lt;/p&gt;
+&lt;p&gt;結果卡在奇怪的地方 這邊簡單紀錄一下&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="雜學清談" scheme="http://example.com/categories/%E9%9B%9C%E5%AD%B8%E6%B8%85%E8%AB%87/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>Wordpress 搬家到 Hexo 心得</title>
@@ -467,29 +488,6 @@
     <category term="tech-note" scheme="http://example.com/categories/tech-note/"/>
     
     <category term="PHP / Laravel" scheme="http://example.com/categories/tech-note/PHP-Laravel/"/>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>[成功竟然有公式」讀後感</title>
-    <link href="http://example.com/2020/11/02/formula-to-success/"/>
-    <id>http://example.com/2020/11/02/formula-to-success/</id>
-    <published>2020-11-01T16:54:51.000Z</published>
-    <updated>2024-11-15T10:19:31.542Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>看書名就覺得是雞湯的書 原本是沒啥覺打算要看 但由於推坑的人真的太多 還是下手來看看</p><p>大概就是在說作者非常召集了一個專門研究怎麼樣才會成功的團隊 做了大大小小的實驗和研究 最後整理出了5個成功的公式</p><h2 id="成功第一定律-你的表現能為你帶來成功，但如果表現的優劣難以判斷，則是人際網路能為你帶來成功"><a href="#成功第一定律-你的表現能為你帶來成功，但如果表現的優劣難以判斷，則是人際網路能為你帶來成功" class="headerlink" title="成功第一定律: 你的表現能為你帶來成功，但如果表現的優劣難以判斷，則是人際網路能為你帶來成功"></a>成功第一定律: 你的表現能為你帶來成功，但如果表現的優劣難以判斷，則是人際網路能為你帶來成功</h2><p>譯: 盡量讓自己變強，同時拓展人脈能讓你更容易被看見</p><h2 id="成功第二定律-表現有上限，但成功無上限"><a href="#成功第二定律-表現有上限，但成功無上限" class="headerlink" title="成功第二定律: 表現有上限，但成功無上限"></a>成功第二定律: 表現有上限，但成功無上限</h2><p>譯: 實力本身是有極限的，像是和愛因斯坦同期、研究成果相當的科學家不在少數 但只有他才名留青史 擁有遠遠超過其他人的成功</p><h2 id="成功第三定律-未來的成功-過去的成功-優先連結-x-適存度-競爭優勢"><a href="#成功第三定律-未來的成功-過去的成功-優先連結-x-適存度-競爭優勢" class="headerlink" title="成功第三定律: 未來的成功 &#x3D; 過去的成功 (優先連結) x 適存度 (競爭優勢)"></a>成功第三定律: 未來的成功 &#x3D; 過去的成功 (優先連結) x 適存度 (競爭優勢)</h2><p>譯: 和第一定復差不多，反正就是要夠猛夠知名 但如果沒有優先連結的話，不斷持續 時間會給你應有的回報</p><h2 id="成功第四定律-成功的團隊需要多元性和平衡"><a href="#成功第四定律-成功的團隊需要多元性和平衡" class="headerlink" title="成功第四定律: 成功的團隊需要多元性和平衡"></a>成功第四定律: 成功的團隊需要多元性和平衡</h2><p>老生常談了啊</p><h2 id="成功第五定律-只要堅持下去，成功隨時都可能來到"><a href="#成功第五定律-只要堅持下去，成功隨時都可能來到" class="headerlink" title="成功第五定律: 只要堅持下去，成功隨時都可能來到"></a>成功第五定律: 只要堅持下去，成功隨時都可能來到</h2><p>S (Success) &#x3D; Qr Q: Q 係數: 執行力 r: random idea: 可以想成點子的價值 Q和r 缺一不可 兩者兼具再加上堅持 年齡不是問題，終究可以成功</p><p>[成功竟然有公式] 博客來連結 <a href="https://growingdna.com/formula-to-success">https://growingdna.com/formula-to-success</a> <img src="https://growingdna.com/wp-content/uploads/2020/11/image-1604249449031.png" alt="file"></p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;看書名就覺得是雞湯的書 原本是沒啥覺打算要看 但由於推坑的人真的太多 還是下手來看看&lt;/p&gt;
-&lt;p&gt;大概就是在說作者非常召集了一個專門研究怎</summary>
-      
-    
-    
-    
-    <category term="興趣陳列" scheme="http://example.com/categories/%E8%88%88%E8%B6%A3%E9%99%B3%E5%88%97/"/>
     
     
   </entry>
