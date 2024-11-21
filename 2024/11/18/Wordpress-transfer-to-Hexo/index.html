@@ -84,7 +84,10 @@ synt.."><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="
 </code></pre>
 <p>就可以了!</p>
 <ol start="2">
-<li>CNAME 設置<br>參考<a target="_blank" rel="noopener" href="https://blog.dmoon.tw/github-pages-custom-domain/index.html">這篇文章</a><br>原來 CNAME 直接放在根目錄的話會在 <code>hexo generate &amp; hexo deploy</code> 時被覆蓋掉<br>要改放到 <code>/source/</code> 底下</li>
+<li><p>CNAME 設置<br>參考<a target="_blank" rel="noopener" href="https://blog.dmoon.tw/github-pages-custom-domain/index.html">這篇文章</a><br>原來 CNAME 直接放在根目錄的話會在 <code>hexo generate &amp; hexo deploy</code> 時被覆蓋掉<br>要改放到 <code>/source/</code> 底下</p>
+</li>
+<li><p>把 source 和 public 分開<br>如果不想把 source (原始資料) 和 public (hexo 編譯後的結果)都上傳的話<br>可以分兩個 repo 上傳<br>針對 source 可以開一個新的 repo 後 git init, git add, git push….etc<br>而 public 就跑上面的 <code>hexo generate &amp; hexo deploy</code> 即可</p>
+</li>
 </ol>
 <h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://github.com/Haojen/hexo-theme-Claudia?tab=readme-ov-file">https://github.com/Haojen/hexo-theme-Claudia?tab=readme-ov-file</a></li>
